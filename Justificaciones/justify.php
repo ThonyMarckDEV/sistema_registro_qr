@@ -4,35 +4,35 @@ date_default_timezone_set('America/Lima');
 require_once '../config.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $codigo_alumno = $_POST['codigo_alumno'];
+    $dni_alumno = $_POST['dni_alumno'];
     $fecha = $_POST['fecha'];
     $motivo = $_POST['motivo'];
     $tipo = $_POST['tipo'];
     
     $conn = getDBConnection();
     
-    // Validate codigo_alumno
-    $stmt = $conn->prepare("SELECT codigo_alumno FROM alumnos WHERE codigo_alumno = ?");
-    $stmt->bind_param("s", $codigo_alumno);
+    // Validate dni_alumno
+    $stmt = $conn->prepare("SELECT dni_alumno FROM alumnos WHERE dni_alumno = ?");
+    $stmt->bind_param("s", $dni_alumno);
     $stmt->execute();
     $result = $stmt->get_result();
     
     if ($result->num_rows === 0) {
-        $_SESSION['justify_message'] = 'Error: El código de alumno no existe.';
+        $_SESSION['justify_message'] = 'Error: El DNI del alumno no existe.';
         header('Location: ../index.php');
         $conn->close();
         exit;
     }
     
     // Insert justification
-    $stmt = $conn->prepare("INSERT INTO justificaciones (codigo_alumno, fecha, motivo, tipo) VALUES (?, ?, ?, ?)");
+    $stmt = $conn->prepare("INSERT INTO justificaciones (dni_alumno, fecha, motivo, tipo) VALUES (?, ?, ?, ?)");
     if (!$stmt) {
         $_SESSION['justify_message'] = 'Error en la preparación de la consulta: ' . $conn->error;
         header('Location: ../index.php');
         $conn->close();
         exit;
     }
-    $stmt->bind_param("ssss", $codigo_alumno, $fecha, $motivo, $tipo);
+    $stmt->bind_param("ssss", $dni_alumno, $fecha, $motivo, $tipo);
     
     if ($stmt->execute()) {
         $_SESSION['justify_message'] = 'Justificación registrada con éxito.';
@@ -64,8 +64,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php endif; ?>
         <form action="justify.php" method="POST" class="space-y-4">
             <div>
-                <label for="codigo_alumno" class="block text-sm font-medium">Código del Alumno</label>
-                <input type="text" name="codigo_alumno" id="codigo_alumno" class="mt-1 block w-full border rounded p-2" required>
+                <label for="dni_alumno" class="block text-sm font-medium">DNI del Alumno</label>
+                <input type="text" name="dni_alumno" id="dni_alumno" class="mt-1 block w-full border rounded p-2" required>
             </div>
             <div>
                 <label for="fecha" class="block text-sm font-medium">Fecha</label>

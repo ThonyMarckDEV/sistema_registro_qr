@@ -8,16 +8,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id_alumno = $_POST['id_alumno'];
     $conn = getDBConnection();
     
-    $stmt = $conn->prepare("SELECT codigo_alumno FROM alumnos WHERE id = ?");
+    $stmt = $conn->prepare("SELECT dni_alumno FROM alumnos WHERE id = ?");
     $stmt->bind_param("i", $id_alumno);
     $stmt->execute();
     $result = $stmt->get_result();
     
     if ($result->num_rows > 0) {
         $alumno = $result->fetch_assoc();
-        $codigo_alumno = $alumno['codigo_alumno'];
+        $dni_alumno = $alumno['dni_alumno'];
         
-        $qr_path = 'qrcodes/' . $codigo_alumno . '.png';
+        $qr_path = 'qrcodes/' . $dni_alumno . '.png';
         if (!file_exists('qrcodes')) {
             mkdir('qrcodes', 0777, true);
         }
@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ]);
         
         $qrcode = new QRCode($options);
-        $qrcode->render($codigo_alumno, $qr_path);
+        $qrcode->render($dni_alumno, $qr_path);
         
         $_SESSION['qr_path'] = $qr_path;
         header('Location: ../index.php');

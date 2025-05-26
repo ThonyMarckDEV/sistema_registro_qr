@@ -4,24 +4,24 @@ date_default_timezone_set('America/Lima');
 require_once '../config.php';
 
 // Get and validate input parameters
-$id_alumno = isset($_GET['id_alumno']) ? trim($_GET['id_alumno']) : null;
+$dni_alumno = isset($_GET['dni_alumno']) ? trim($_GET['dni_alumno']) : null;
 $start_date = isset($_GET['start_date']) && !empty($_GET['start_date']) ? $_GET['start_date'] : null;
 $end_date = isset($_GET['end_date']) && !empty($_GET['end_date']) ? $_GET['end_date'] : null;
 
 // Build the SQL query
 $conn = getDBConnection();
 $conn->query("SET time_zone = '-05:00'");
-$sql = "SELECT a.codigo_alumno, al.nombre, al.apellido, a.tipo, a.fecha_hora, a.estado 
+$sql = "SELECT a.dni_alumno, al.nombre, al.apellido, a.tipo, a.fecha_hora, a.estado 
         FROM asistencias a 
-        JOIN alumnos al ON a.codigo_alumno = al.codigo_alumno";
+        JOIN alumnos al ON a.dni_alumno = al.dni_alumno";
 $params = [];
 $types = '';
 $where_clauses = [];
 
-if ($id_alumno) {
-    $where_clauses[] = "al.id_alumno = ?";
-    $params[] = $id_alumno;
-    $types .= 'i';
+if ($dni_alumno) {
+    $where_clauses[] = "al.dni_alumno = ?";
+    $params[] = $dni_alumno;
+    $types .= 's';
 }
 if ($start_date) {
     $where_clauses[] = "DATE(a.fecha_hora) >= ?";
@@ -63,17 +63,17 @@ $conn->close();
 <body class="bg-gray-100">
     <div class="container mx-auto p-4">
         <h1 class="text-2xl font-bold mb-4">Vista Previa del Reporte</h1>
-        <a href="report_form.php" class="text-blue-500 hover:underline mb-4 inline-block">← Volver al Formulario</a>
+        <a href="report.php" class="text-blue-500 hover:underline mb-4 inline-block">← Volver al Formulario</a>
         
         <div class="mb-4">
             <h2 class="text-xl font-semibold">
                 Reporte de Asistencias
-                <?php if ($id_alumno) echo " - Alumno ID: " . htmlspecialchars($id_alumno); ?>
+                <?php if ($dni_alumno) echo " - DNI Alumno: " . htmlspecialchars($dni_alumno); ?>
                 <?php if ($start_date) echo " - Desde: " . htmlspecialchars($start_date); ?>
                 <?php if ($end_date) echo " - Hasta: " . htmlspecialchars($end_date); ?>
             </h2>
             <a href="report.php?format=pdf<?php 
-                echo $id_alumno ? '&id_alumno=' . urlencode($id_alumno) : '';
+                echo $dni_alumno ? '&dni_alumno=' . urlencode($dni_alumno) : '';
                 echo $start_date ? '&start_date=' . urlencode($start_date) : '';
                 echo $end_date ? '&end_date=' . urlencode($end_date) : '';
             ?>" class="bg-green-500 text-white px-4 py-2 rounded inline-block mt-2">Descargar PDF</a>
@@ -86,7 +86,7 @@ $conn->close();
                 <table class="min-w-full bg-white border rounded">
                     <thead>
                         <tr class="bg-gray-200">
-                            <th class="py-2 px-4 border">Código</th>
+                            <th class="py-2 px-4 border">DNI</th>
                             <th class="py-2 px-4 border">Nombre</th>
                             <th class="py-2 px-4 border">Tipo</th>
                             <th class="py-2 px-4 border">Fecha/Hora</th>
@@ -96,7 +96,7 @@ $conn->close();
                     <tbody>
                         <?php foreach ($records as $row): ?>
                             <tr>
-                                <td class="py-2 px-4 border"><?php echo htmlspecialchars($row['codigo_alumno']); ?></td>
+                                <td class="py-2 px-4 border"><?php echo htmlspecialchars($row['dni_alumno']); ?></td>
                                 <td class="py-2 px-4 border"><?php echo htmlspecialchars($row['nombre'] . ' ' . $row['apellido']); ?></td>
                                 <td class="py-2 px-4 border"><?php echo htmlspecialchars($row['tipo']); ?></td>
                                 <td class="py-2 px-4 border"><?php echo htmlspecialchars($row['fecha_hora']); ?></td>

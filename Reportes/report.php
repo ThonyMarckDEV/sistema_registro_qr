@@ -11,7 +11,7 @@ $conn->query("SET time_zone = '-05:00'"); // Set MySQL to America/Lima (UTC-5)
 
 // Get and validate input parameters
 $format = isset($_GET['format']) ? $_GET['format'] : 'pdf';
-$id_alumno = isset($_GET['id_alumno']) ? trim($_GET['id_alumno']) : (isset($_POST['id_alumno']) ? trim($_POST['id_alumno']) : null);
+$dni_alumno = isset($_GET['dni_alumno']) ? trim($_GET['dni_alumno']) : (isset($_POST['dni_alumno']) ? trim($_POST['dni_alumno']) : null);
 $start_date = isset($_GET['start_date']) && !empty($_GET['start_date']) ? $_GET['start_date'] : null;
 $end_date = isset($_GET['end_date']) && !empty($_GET['end_date']) ? $_GET['end_date'] : null;
 
@@ -35,6 +35,14 @@ if ($start_date && $end_date && $start_date > $end_date) {
     exit;
 }
 
+// Validate dni_alumno format
+if ($dni_alumno && !preg_match('/^\d{8}$/', $dni_alumno)) {
+    ob_end_clean();
+    echo json_encode(['message' => 'El DNI del alumno debe contener exactamente 8 dígitos numéricos.']);
+    $conn->close();
+    exit;
+}
+
 if ($format === 'pdf') {
     $pdf = new \TCPDF();
     $pdf->AddPage();
@@ -42,8 +50,8 @@ if ($format === 'pdf') {
 
     // Set the title based on filters
     $title = 'Reporte de Asistencias';
-    if ($id_alumno) {
-        $title .= ' - Alumno ID: ' . htmlspecialchars($id_alumno);
+    if ($dni_alumno) {
+        $title .= ' - DNI Alumno: ' . htmlspecialchars($dni_alumno);
     }
     if ($start_date && $end_date) {
         $title .= ' - Desde: ' . htmlspecialchars($start_date) . ' Hasta: ' . htmlspecialchars($end_date);
@@ -60,17 +68,17 @@ if ($format === 'pdf') {
     $pdf->SetFont('helvetica', '', 12);
 
     // Build the SQL query
-    $sql = "SELECT a.codigo_alumno, al.nombre, al.apellido, a.tipo, a.fecha_hora, a.estado 
+    $sql = "SELECT a.dni_alumno, al.nombre, al.apellido, a.tipo, a.fecha_hora, a.estado 
             FROM asistencias a 
-            JOIN alumnos al ON a.codigo_alumno = al.codigo_alumno";
+            JOIN alumnos al ON a.dni_alumno = al.dni_alumno";
     $params = [];
     $types = '';
     $where_clauses = [];
 
-    if ($id_alumno) {
-        $where_clauses[] = "al.id_alumno = ?";
-        $params[] = $id_alumno;
-        $types .= 'i';
+    if ($dni_alumno) {
+        $where_clauses[] = "al.dni_alumno = ?";
+        $params[] = $dni_alumno;
+        $types .= 's';
     }
     if ($start_date) {
         $where_clauses[] = "DATE(a.fecha_hora) >= ?";
@@ -110,7 +118,7 @@ if ($format === 'pdf') {
     } else {
         // Add table header
         $pdf->SetFont('helvetica', 'B', 12);
-        $pdf->Cell(40, 10, 'Código', 1, 0, 'C');
+        $pdf->Cell(40, 10, 'DNI', 1, 0, 'C');
         $pdf->Cell(60, 10, 'Nombre', 1, 0, 'C');
         $pdf->Cell(30, 10, 'Tipo', 1, 0, 'C');
         $pdf->Cell(50, 10, 'Fecha/Hora', 1, 0, 'C');
@@ -119,7 +127,7 @@ if ($format === 'pdf') {
 
         // Add table rows
         while ($row = $result->fetch_assoc()) {
-            $pdf->Cell(40, 10, $row['codigo_alumno'], 1, 0);
+            $pdf->Cell(40, 10, $row['dni_alumno'], 1, 0);
             $pdf->Cell(60, 10, "{$row['nombre']} {$row['apellido']}", 1, 0);
             $pdf->Cell(30, 10, $row['tipo'], 1, 0);
             $pdf->Cell(50, 10, $row['fecha_hora'], 1, 0);

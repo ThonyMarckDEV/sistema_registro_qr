@@ -26,13 +26,14 @@ require_once '../config.php';
         
         <form action="justify.php" method="POST" class="space-y-4" onsubmit="return validateJustificationForm()">
             <div>
-                <label for="justify_codigo" class="block text-sm font-medium">Código del Alumno</label>
-                <input type="text" name="codigo_alumno" id="justify_codigo" class="mt-1 block w-full border rounded p-2" required>
+                <label for="justify_dni" class="block text-sm font-medium">DNI del Alumno</label>
+                <input type="text" name="dni_alumno" id="justify_dni" class="mt-1 block w-full border rounded p-2" required>
             </div>
             <div>
                 <label for="fecha" class="block text-sm font-medium">Fecha</label>
                 <input type="date" name="fecha" id="fecha" class="mt-1 block w-full border rounded p-2" required>
             </div>
+            <div>
                 <label for="motivo" class="block text-sm font-medium">Motivo</label>
                 <textarea name="motivo" id="motivo" class="mt-1 block w-full border rounded p-2" required></textarea>
             </div>
@@ -49,17 +50,17 @@ require_once '../config.php';
 
     <script>
         function validateJustificationForm() {
-            const codigo = document.getElementById('justify_codigo').value;
+            const dni = document.getElementById('justify_dni').value;
             const fecha = document.getElementById('fecha').value;
             const motivo = document.getElementById('motivo').value;
             const tipo = document.getElementById('tipo').value;
 
-            if (!codigo || !fecha || !motivo || !tipo) {
+            if (!dni || !fecha || !motivo || !tipo) {
                 alert('Por favor, complete todos los campos.');
                 return false;
             }
-            if (!/^[A-Z0-9]+$/.test(codigo)) {
-                alert('El código de alumno debe contener solo letras mayúsculas y números.');
+            if (!/^\d{8}$/.test(dni)) {
+                alert('El DNI del alumno debe contener exactamente 8 dígitos numéricos.');
                 return false;
             }
             return true;

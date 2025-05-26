@@ -20,8 +20,8 @@ require_once '../config.php';
         
         <form action="report_output.php" method="GET" class="space-y-4">
             <div>
-                <label for="report_id_alumno" class="block text-sm font-medium">ID del Alumno (opcional)</label>
-                <input type="text" name="id_alumno" id="report_id_alumno" class="mt-1 block w-full border rounded p-2" placeholder="Ej: 1">
+                <label for="report_dni_alumno" class="block text-sm font-medium">DNI del Alumno (opcional)</label>
+                <input type="text" name="dni_alumno" id="report_dni_alumno" class="mt-1 block w-full border rounded p-2" placeholder="Ej: 12345678">
             </div>
             <div>
                 <label for="start_date" class="block text-sm font-medium">Fecha de Inicio</label>
@@ -42,9 +42,15 @@ require_once '../config.php';
         document.querySelector('form[action="report_output.php"]').addEventListener('submit', function(e) {
             const startDate = document.getElementById('start_date').value;
             const endDate = document.getElementById('end_date').value;
+            const dni = document.getElementById('report_dni_alumno').value;
+
             if (startDate && endDate && startDate > endDate) {
                 e.preventDefault();
                 alert('La fecha de inicio no puede ser posterior a la fecha de fin.');
+            }
+            if (dni && !/^\d{8}$/.test(dni)) {
+                e.preventDefault();
+                alert('El DNI del alumno debe contener exactamente 8 dígitos numéricos.');
             }
         });
     </script>

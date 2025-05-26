@@ -34,8 +34,8 @@ require_once '../config.php';
 
         <!-- Manual Input Fallback -->
         <div class="mb-4">
-            <label for="manual_codigo" class="block text-sm font-medium">Ingresar Código Manualmente</label>
-            <input type="text" id="manual_codigo" class="mt-1 block w-full border rounded p-2" placeholder="Ej: AL001">
+            <label for="manual_dni" class="block text-sm font-medium">Ingresar DNI Manualmente</label>
+            <input type="text" id="manual_dni" class="mt-1 block w-full border rounded p-2" placeholder="Ej: 12345678">
             <button onclick="manualScan()" class="bg-blue-500 text-white px-4 py-2 rounded mt-2">Registrar</button>
         </div>
         
@@ -90,11 +90,11 @@ require_once '../config.php';
             stopScanner();
 
             const url = './scan_qr.php';
-            console.log('Fetching URL:', url, 'with codigo_alumno:', decodedText);
+            console.log('Fetching URL:', url, 'with dni_alumno:', decodedText);
             fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: 'codigo_alumno=' + encodeURIComponent(decodedText)
+                body: 'dni_alumno=' + encodeURIComponent(decodedText)
             })
             .then(response => {
                 console.log('Response status:', response.status, 'URL:', response.url);
@@ -112,7 +112,7 @@ require_once '../config.php';
                     scanResult.classList.add(data.message.includes('registrada correctamente') ? 'text-green-500' : 'text-red-500');
                     attendanceDetails.classList.remove('hidden');
                     attendanceDetails.innerHTML = `
-                        <p><strong>Código Alumno:</strong> ${data.codigo_alumno || decodedText}</p>
+                        <p><strong>DNI Alumno:</strong> ${data.dni_alumno || decodedText}</p>
                         <p><strong>Alumno:</strong> ${data.nombre || 'No disponible'} ${data.apellido || ''}</p>
                         <p><strong>Mensaje:</strong> ${data.message}</p>
                     `;
@@ -135,14 +135,14 @@ require_once '../config.php';
         startScanner();
 
         function manualScan() {
-            const codigo = document.getElementById('manual_codigo').value;
-            if (codigo && !isScanning) {
-                processScan(codigo);
+            const dni = document.getElementById('manual_dni').value;
+            if (dni && !isScanning) {
+                processScan(dni);
             } else if (isScanning) {
                 scanResult.innerText = 'Espere a que termine el escaneo actual.';
                 scanResult.classList.add('text-red-500');
             } else {
-                scanResult.innerText = 'Por favor, ingresa un código válido.';
+                scanResult.innerText = 'Por favor, ingresa un DNI válido.';
                 scanResult.classList.add('text-red-500');
             }
         }
